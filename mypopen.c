@@ -1,7 +1,18 @@
+// noch zu tun: errno richtig setzen, pipe-Enden im Fehlerfall richtig schließen
+// sicherstellen dass nur ein child-process generiert wird
+
 #include "mypopen.h"
 
 
+static pid_t child_pid = -1;
+
+
 FILE *mypopen(const char *const command, const char *const type){
+	if(child_pid != -1){
+		// errno = 
+		return NULL;
+	}
+
 	int fd[2];                                               // Filedeskriptor
 	FILE *stream;                                            // Filepointer
 
@@ -11,19 +22,16 @@ FILE *mypopen(const char *const command, const char *const type){
 	}
 
 	if(pipe(fd) == -1){                                      // pipe einrichten
-		// errno = 
 		return NULL;
 	}
 
-	pid_t child_pid;
-
 	switch(child_pid = fork()){                              // Kindprozess mittels fork() erzeugen
 		case -1:                                             // Fehler bei fork()
-			// errno = 
+			close(fd[0]);
+			close(fd[1]);
 			return NULL;
-			break;
 		case 0:                                              // child-process
-			child_process(fd, command, type);
+			child_process(fd, type, command);
 			break;
 		default:                                             // parent-process
 			return parent_process(fd, type);
@@ -31,18 +39,17 @@ FILE *mypopen(const char *const command, const char *const type){
 } // end mypopen
 
 
-void child_process(int *fd, const char *const command, const char *const type){
+void child_process(int *fd, const char *const type, const char *const command){
 	if(strcmp(type, "r") == 0){                         // command-Eingabe wird in pipe geschrieben
 		close(fd[0]);                                   // Lese-Ende der pipe schließen
 
         if(fd[1] != STDOUT_FILENO){                     // nur duplizieren wenn noch nicht existent
 			if(dup2(fd[1], STDOUT_FILENO) == -1){       // dupliziert Filedeskriptor
-				// errno = 
+				close(fd[1]);
 				exit(EXIT_FAILURE);
 			}
 		}
 		if (close(fd[1]) == -1){                        // nach dem Duplizieren wird das
-			// errno =                                  // Schreib-Ende nicht mehr benötigt
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -51,6 +58,7 @@ void child_process(int *fd, const char *const command, const char *const type){
 
         if(fd[0] != STDIN_FILENO){                      // nur duplizieren wenn noch nicht existent
 			if(dup2(fd[0], STDIN_FILENO) == -1){        // dupliziert Filedeskriptor
+				close(fd[0]);
 				exit(EXIT_FAILURE);
 			}
 		}
@@ -60,7 +68,6 @@ void child_process(int *fd, const char *const command, const char *const type){
 
 	execl("/bin/sh", "sh", "-c", command, (char *)NULL);  // Ausführen des Befehls
 
-	// errno =
 	exit(EXIT_FAILURE);
 } // end child_process
 
@@ -71,12 +78,16 @@ FILE *parent_process(int *fd, const char *const type){
 	if(strcmp(type, "r") == 0){                           // im parent-process wird gelesen
 		close(fd[1]);                                     // Schreib-Ende der pipe schließen
 
-		stream = fdopen(fd[0], "r");
+		if(stream = fdopen(fd[0], "r") == NULL){
+			close(fd[0]);
+		}
 	}
-	else{ // type == 'w'                                     im parent-process wird geschrieben
+	else{                                                 // type == 'w' im parent wird geschrieben
 		close(fd[0]);                                     // Lese-Ende der pipe schließen
 
-		stream = fdopen(fd[1], "w");
+		if(stream = fdopen(fd[1], "w") == NULL){
+			close(fd[1]);
+		}
 	}
 
 	return stream;
@@ -84,10 +95,12 @@ FILE *parent_process(int *fd, const char *const type){
 
 
 int mypclose(FILE *stream){
-	pid_t wait_pid = -1;
 	int status = -1;
+	pid_t wait_pid = 0;
 
-	while((wait_pid = wait(&status))){                    // auf child-process warten
+	fclose(stream);
+
+	while((wait_pid = waitpid(child_pid, &status, 0)) != child_pid){   // auf child-process warten
 		if(wait_pid != -1){
 			continue;
 		}
@@ -95,10 +108,17 @@ int mypclose(FILE *stream){
 			continue;
 		}
 
+		// errno = 
 		return -1;                                        // Fehler beim Warten auf child-process
 	}
 
-	return (fclose(stream));
+	if(WIFEXITED(status) == 1){
+		return WEXITSTATUS(status);
+	}
+	else{
+		// errno = 
+		return -1;
+	}
 } // end mypclose
 
 
