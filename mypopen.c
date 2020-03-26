@@ -12,6 +12,7 @@ FILE *mypopen(const char *const command, const char *const type){
 		// errno = 
 		return NULL;
 	}
+	
 
 	int fd[2];                                               // Filedeskriptor
 	FILE *stream = NULL;                                     // Filepointer
