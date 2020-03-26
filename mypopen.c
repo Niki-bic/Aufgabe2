@@ -14,7 +14,7 @@ FILE *mypopen(const char *const command, const char *const type){
 	}
 
 	int fd[2];                                               // Filedeskriptor
-	FILE *stream;                                            // Filepointer
+	FILE *stream = NULL;                                     // Filepointer
 
 	if(strcmp(type, "r") != 0 && strcmp(type, "w") != 0){    // type ist falsch
 		errno = EINVAL;
@@ -34,8 +34,9 @@ FILE *mypopen(const char *const command, const char *const type){
 			child_process(fd, type, command);
 			break;
 		default:                                             // parent-process
-			return parent_process(fd, type);
+			stream = parent_process(fd, type);
 	}
+	return stream;
 } // end mypopen
 
 
@@ -73,19 +74,19 @@ void child_process(int *fd, const char *const type, const char *const command){
 
 
 FILE *parent_process(int *fd, const char *const type){
-	FILE *stream;
+	FILE *stream = NULL;
 
 	if(strcmp(type, "r") == 0){                           // im parent-process wird gelesen
 		close(fd[1]);                                     // Schreib-Ende der pipe schließen
 
-		if(stream = fdopen(fd[0], "r") == NULL){
+		if((stream = fdopen(fd[0], "r")) == NULL){
 			close(fd[0]);
 		}
 	}
 	else{                                                 // type == 'w' im parent wird geschrieben
 		close(fd[0]);                                     // Lese-Ende der pipe schließen
 
-		if(stream = fdopen(fd[1], "w") == NULL){
+		if((stream = fdopen(fd[1], "w")) == NULL){
 			close(fd[1]);
 		}
 	}
