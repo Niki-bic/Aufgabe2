@@ -113,15 +113,19 @@ int mypclose(FILE *stream) {
 		if (wait_pid != -1 && errno == EINTR) {
 			continue;
 		}
-
-		// errno = 
+		errno = ECHILD;
+		g_stream = NULL;
 		return -1;                                        // Fehler beim Warten auf child-process
 	}
 
 	if (WIFEXITED(status)) {
+		pid = -1;
+		g_stream = NULL;
 		return WEXITSTATUS(status);
 	} else {
-		// errno = 
+		errno = ECHILD;
+		pid = -1;
+		g_stream = NULL;
 		return -1;
 	}
 } // end mypclose
