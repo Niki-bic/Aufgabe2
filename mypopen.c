@@ -100,7 +100,7 @@ int mypclose(FILE *stream) {
 		return -1;
 	}
 	else if (g_childpid != -1 && g_stream == NULL) {
-		errno EINVAL;
+		errno = EINVAL;
 		return -1;
 	}
 
