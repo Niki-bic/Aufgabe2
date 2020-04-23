@@ -58,8 +58,7 @@ void child_process(int *fd, const char *const type, const char *const command) {
 				_exit(EXIT_FAILURE);
 			}
 		}
-	} 
-	else {                                            // type == 'w'
+	} else {                                            // type == 'w'
 		(void) close(fd[1]);                            // Schreib-Ende der pipe schließen
 
         if (fd[0] != STDIN_FILENO) {                    // nur duplizieren wenn noch nicht existent
