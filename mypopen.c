@@ -54,12 +54,12 @@ void child_process(int *fd, const char *const type, const char *const command) {
         if (fd[1] != STDOUT_FILENO) {                   // nur duplizieren wenn noch nicht existent
 			if (dup2(fd[1], STDOUT_FILENO) == -1) {     // dupliziert Filedeskriptor
 				(void) close(fd[1]);
-				exit(EXIT_FAILURE);
+				_exit(EXIT_FAILURE);
 			}
 		}
 
 		if (close(fd[1]) == -1) {                       // Schreib-Ende wird nicht mehr benötigt
-			exit(EXIT_FAILURE);
+			_exit(EXIT_FAILURE);
 		}
 	} else {                                            // type == 'w'  
 		(void) close(fd[1]);                            // Schreib-Ende der pipe schließen
@@ -67,7 +67,7 @@ void child_process(int *fd, const char *const type, const char *const command) {
         if (fd[0] != STDIN_FILENO) {                    // nur duplizieren wenn noch nicht existent
 			if (dup2(fd[0], STDIN_FILENO) == -1) {      // dupliziert Filedeskriptor
 				(void) close(fd[0]);
-				exit(EXIT_FAILURE);
+				_exit(EXIT_FAILURE);
 			}
 		}
 
@@ -76,7 +76,7 @@ void child_process(int *fd, const char *const type, const char *const command) {
 
 	(void) execl("/bin/sh", "sh", "-c", command, (char *) NULL);  // Ausführen des Befehls
 
-	exit(EXIT_FAILURE);                                 // wird nur im Fehlerfall ausgeführt
+	_exit(EXIT_FAILURE);                                 // wird nur im Fehlerfall ausgeführt
 } // end child_process
 
 
