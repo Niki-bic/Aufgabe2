@@ -1,6 +1,3 @@
-// noch zu tun: errno richtig setzen, pipe-Enden im Fehlerfall richtig schließen
-
-
 #include "mypopen.h"
 
 
@@ -11,36 +8,35 @@ static FILE *g_stream = NULL;
 void reset(void) {
 	g_childpid = -1;
 	g_stream = NULL;
-} // end rest
+} // end reset
 
 
 FILE *mypopen(const char *const command, const char *const type) {
-	int fd[2] = {0};                                         // Filedeskriptor
+	int fd[2] = {0};                                    // Filedeskriptor
 
-	if (g_childpid != -1) {                                  // child existiert schon
+	if (g_childpid != -1) {                             // child existiert schon
 		errno = EAGAIN;
 		return NULL;
 	}
-
 
 	if (type == NULL || (strcmp(type, "r") != 0 && strcmp(type, "w") != 0)) {  // type ist falsch
 		errno = EINVAL;
 		return NULL;
 	}
 
-	if (pipe(fd) == -1) {                                    // pipe einrichten
+	if (pipe(fd) == -1) {                               // pipe einrichten
 		return NULL;
 	}
 
-	switch (g_childpid = fork()) {                           // Kindprozess mittels fork() erzeugen
-		case -1:                                             // Fehler bei fork()
+	switch (g_childpid = fork()) {                      // Kindprozess mittels fork() erzeugen
+		case -1:                                        // Fehler bei fork()
 			(void) close(fd[0]);
 			(void) close(fd[1]);
 			return NULL;
-		case 0:                                              // child-process
+		case 0:                                         // child-process
 			child_process(fd, type, command);
 			break;
-		default:                                             // parent-process
+		default:                                        // parent-process
 			parent_process(fd, type);
 	}
 
@@ -57,12 +53,11 @@ void child_process(int *fd, const char *const type, const char *const command) {
 				(void) close(fd[1]);
 				_exit(EXIT_FAILURE);
 			}
-		}
 
 		if (close(fd[1]) == -1) {                       // Schreib-Ende wird nicht mehr benötigt
 			_exit(EXIT_FAILURE);
 		}
-	} else {                                            // type == 'w'  
+	} else {                                            // type == 'w'
 		(void) close(fd[1]);                            // Schreib-Ende der pipe schließen
 
         if (fd[0] != STDIN_FILENO) {                    // nur duplizieren wenn noch nicht existent
@@ -70,29 +65,28 @@ void child_process(int *fd, const char *const type, const char *const command) {
 				(void) close(fd[0]);
 				_exit(EXIT_FAILURE);
 			}
-		}
 
 		(void) close(fd[0]);                            // Lese-Ende wird nicht mehr benötigt
 	}
 
 	(void) execl("/bin/sh", "sh", "-c", command, (char *) NULL);  // Ausführen des Befehls
 
-	_exit(EXIT_FAILURE);                                 // wird nur im Fehlerfall ausgeführt
+	_exit(EXIT_FAILURE);                                // wird nur im Fehlerfall ausgeführt
 } // end child_process
 
 
 void parent_process(int *fd, const char *const type) {
-	if (type[0] == 'r') {                                 // im parent-process wird gelesen
-		(void) close(fd[1]);                              // Schreib-Ende der pipe schließen
+	if (type[0] == 'r') {                               // im parent-process wird gelesen
+		(void) close(fd[1]);                            // Schreib-Ende der pipe schließen
 
-		if ((g_stream = fdopen(fd[0], "r")) == NULL) {    // Filedeskriptor in Stream umwandeln
+		if ((g_stream = fdopen(fd[0], "r")) == NULL) {  // Filedeskriptor in Stream umwandeln
 			reset();
 			(void) close(fd[0]);
-		}   
-	} else {                                              // type == 'w' im parent wird geschrieben
-		(void) close(fd[0]);                              // Lese-Ende der pipe schließen
+		}
+	} else {                                            // type == 'w' im parent wird geschrieben
+		(void) close(fd[0]);                            // Lese-Ende der pipe schließen
 
-		if ((g_stream = fdopen(fd[1], "w")) == NULL) {    // Filedeskriptor in Stream umwandeln
+		if ((g_stream = fdopen(fd[1], "w")) == NULL) {  // Filedeskriptor in Stream umwandeln
 			reset();
 			(void) close(fd[1]);
 		}
@@ -104,7 +98,7 @@ int mypclose(FILE *stream) {
 	pid_t wait_pid = 0;
 	int status = -1;
 
-	if (g_childpid == -1 && g_stream == NULL) {                             // mypopen wurde nicht aufgerufen
+	if (g_childpid == -1 && g_stream == NULL) {         // mypopen wurde nicht aufgerufen
 		errno = ECHILD;
 		return -1;
 	}
@@ -121,7 +115,7 @@ int mypclose(FILE *stream) {
 	if (fclose(stream) != 0) {                          // stream schließen
 		(void) kill(g_childpid, SIGKILL);
 		return -1;
-	}       
+	}
 
 	while ((wait_pid = waitpid(g_childpid, &status, 0)) != g_childpid) {// auf child-process warten
 		if (wait_pid != -1 && errno == EINTR) {
@@ -129,7 +123,7 @@ int mypclose(FILE *stream) {
 		}
 		errno = ECHILD;
 		g_stream = NULL;
-		return -1;                                        // Fehler beim Warten auf child-process
+		return -1;                                      // Fehler beim Warten auf child-process
 	}
 
 	reset();
