@@ -96,7 +96,7 @@ int mypclose(FILE *stream) {
 	int status = -1;
 
 	if (g_childpid == -1) {                             // mypopen wurde nicht aufgerufen
-		// errno = 
+		errno = ECHILD
 		return -1;
 	}
 

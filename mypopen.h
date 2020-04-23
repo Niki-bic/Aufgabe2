@@ -17,5 +17,3 @@ void parent_process(int *fd, const char *const type);
 
 
 #endif
-
-
