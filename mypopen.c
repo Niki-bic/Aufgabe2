@@ -22,7 +22,8 @@ FILE *mypopen(const char *const command, const char *const type) {
 		return NULL;
 	}
 
-	if (strcmp(type, "r") != 0 && strcmp(type, "w") != 0) {  // type ist falsch
+
+	if (type == NULL || (strcmp(type, "r") != 0 && strcmp(type, "w") != 0)) {  // type ist falsch
 		errno = EINVAL;
 		return NULL;
 	}
