@@ -110,6 +110,7 @@ int mypclose(FILE *stream) {
 	}
 
 	if (fclose(stream) != 0) {                          // stream schließen
+		(void) kill(g_childpid, SIGKILL);
 		return -1;
 	}       
 
