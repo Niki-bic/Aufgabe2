@@ -119,12 +119,12 @@ int mypclose(FILE *stream) {
 	}
 
 	if (WIFEXITED(status)) {
-		pid = -1;
+		g_childpid = -1;
 		g_stream = NULL;
 		return WEXITSTATUS(status);
 	} else {
 		errno = ECHILD;
-		pid = -1;
+		g_childpid = -1;
 		g_stream = NULL;
 		return -1;
 	}
