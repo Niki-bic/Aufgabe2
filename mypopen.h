@@ -14,6 +14,7 @@ FILE *mypopen(const char *const command, const char *const type);
 int mypclose(FILE *stream);
 void child_process(int *fd, const char *const type, const char *const command);
 void parent_process(int *fd, const char *const type);
+void reset(void);
 
 
 #endif

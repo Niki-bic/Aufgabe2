@@ -8,6 +8,12 @@ static pid_t g_childpid = -1;
 static FILE *g_stream = NULL;
 
 
+void reset(void) {
+	g_childpid = -1;
+	g_stream = NULL;
+} // end rest
+
+
 FILE *mypopen(const char *const command, const char *const type) {
 	int fd[2] = {0};                                         // Filedeskriptor
 
@@ -79,12 +85,14 @@ void parent_process(int *fd, const char *const type) {
 		(void) close(fd[1]);                              // Schreib-Ende der pipe schließen
 
 		if ((g_stream = fdopen(fd[0], "r")) == NULL) {    // Filedeskriptor in Stream umwandeln
+			reset();
 			(void) close(fd[0]);
 		}   
 	} else {                                              // type == 'w' im parent wird geschrieben
 		(void) close(fd[0]);                              // Lese-Ende der pipe schließen
 
 		if ((g_stream = fdopen(fd[1], "w")) == NULL) {    // Filedeskriptor in Stream umwandeln
+			reset();
 			(void) close(fd[1]);
 		}
 	}
@@ -123,16 +131,13 @@ int mypclose(FILE *stream) {
 		return -1;                                        // Fehler beim Warten auf child-process
 	}
 
+	reset();
+
 	if (WIFEXITED(status)) {
-		g_childpid = -1;
-		g_stream = NULL;
 		return WEXITSTATUS(status);
 	} else {
 		errno = ECHILD;
-		g_childpid = -1;
-		g_stream = NULL;
 		return -1;
 	}
 } // end mypclose
-
 
