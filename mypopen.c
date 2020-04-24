@@ -54,7 +54,7 @@ void child_process(int *fd, const char *const type, const char *const command) {
 				_exit(EXIT_FAILURE);
 			}
 
-			if (close(fd[1]) == -1) {                       // Schreib-Ende wird nicht mehr benötigt
+			if (close(fd[1]) == -1) {                   // Schreib-Ende wird nicht mehr benötigt
 				_exit(EXIT_FAILURE);
 			}
 		}
