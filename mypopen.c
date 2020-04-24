@@ -120,7 +120,7 @@ int mypclose(FILE *stream) {
 	}
 
 	while ((wait_pid = waitpid(g_childpid, &status, 0)) != g_childpid) {// auf child-process warten
-		if (wait_pid != -1 && errno == EINTR) {
+		if (wait_pid == -1 && errno == EINTR) {
 			continue;
 		}
 		errno = ECHILD;
