@@ -103,8 +103,7 @@ int mypclose(FILE *stream) {
 	if (g_childpid == -1 && g_stream == NULL) {         // mypopen wurde nicht aufgerufen
 		errno = ECHILD;
 		return -1;
-	}
-	else if (g_childpid != -1 && g_stream == NULL) {
+	} else if (g_childpid != -1 && g_stream == NULL) {
 		errno = EINVAL;
 		return -1;
 	}
