@@ -1,9 +1,35 @@
+/**
+ * @file mypopen.c
+ * BES - mypopen.c function and associated functions
+ * Projekt 2
+ *
+ * Gruppe 13
+ *
+ * @author Patrik Binder         <ic19b030@technikum-wien.at>
+ * @author Stefan Pittner        <ic19b003@technikum-wien.at>
+ * @author Nikolaus Ferchenbauer <ic19b013@technikum-wien.at>
+ * @date 2020/05/4
+ *
+ * @version 1.x
+ *
+ */
+
+/**
+ * -------------------------------------------------------------- includes --
+ */
+
 #include "mypopen.h"
 
+/**
+ * --------------------------------------------------------------- globals --
+ */
 
 static pid_t g_childpid = -1;
 static FILE *g_stream = NULL;
 
+/**
+ * ------------------------------------------------------------- functions --
+ */
 
 void reset(void) {
 	g_childpid = -1;
@@ -11,6 +37,21 @@ void reset(void) {
 } 
 // end reset
 
+/**
+ * \brief mypopen - a simple implementation of the popen function to fork a process
+ * @details this function generates a pipe and creates a child process with 
+ * the systemcall fork, inside the child process the system function dup2 
+ * redirects either stdout or stdin from the child process to the used end,
+ * either to the read or write end of the pipe, then the execl systemcall
+ * opens the bash shell with the -c flag (man bash) to execute the given 
+ * command from the string, the file descriptor (fd) is returned to 
+ * the caller as a file stream
+ *
+ * \param command - the bash command which the pipe is opened for
+ * \param modus - "r" read or "w" write - direction of pipe 
+ *
+ * \return NULL if an error occured and errno is set, global filepointer on success
+*/
 
 FILE *mypopen(const char *const command, const char *const type) {
 	// Filedeskriptor
@@ -49,6 +90,19 @@ FILE *mypopen(const char *const command, const char *const type) {
 } 
 // end mypopen
 
+/**
+ * \brief child_process - function called insinde the child process for redirection
+ * @details this function calls the system function dup2 to redirect either stdout 
+ * or stdin from the child process to the used end, either to the read or write end 
+ * of the pipe, then the execl systemcall opens the bash shell with the -c 
+ * flag (man bash) to execute the given command from the string
+ *
+ * \param *fd - the file descriptor with which the pipe was created
+ * \param type - "r" read or "w" write - direction of pipe 
+ * \param command - command which gets executed by the bash shell
+ *
+ * \return no return value
+*/
 
 void child_process(int *fd, const char *const type, const char *const command) {
 	// command-Eingabe wird in pipe geschrieben
@@ -89,6 +143,18 @@ void child_process(int *fd, const char *const type, const char *const command) {
 } 
 // end child_process
 
+/**
+ * \brief parent_process - function called inside the parent process to 
+ * convert the file descriptor
+ * @details this function executes the systemcall fdopen to convert 
+ * the handed file descriptor to a file stream for returning it with the 
+ * mypopen function
+ *
+ * \param *fd - the file descriptor with which the pipe was created
+ * \param type - "r" read or "w" write - direction of pipe 
+ *
+ * \return no return value
+*/
 
 void parent_process(int *fd, const char *const type) {
 	// im parent-process wird gelesen
@@ -114,6 +180,16 @@ void parent_process(int *fd, const char *const type) {
 } 
 // end parent_process
 
+/**
+ * \brief mypclose - function waiting for the child process to terminate
+ * @details this function waits for the process called by mypopen to terminate,
+ * it returns the exit status created by waitpid and closes the passed file stream
+ * if it is equal to the associated one from mypopen
+ *
+ * \param *stream - filepointer handed over by the caller
+ *
+ * \return -1 on error, exit status of the child process on success
+*/
 
 int mypclose(FILE *stream) {
 	pid_t wait_pid = 0;
@@ -159,3 +235,15 @@ int mypclose(FILE *stream) {
 } 
 // end mypclose
 
+/**
+ * =================================================================== eof ==
+ */
+
+ /**
+ * mode: c
+ * c-mode: k&r
+ * c-basic-offset: 4
+ * indent-tabs-mode: t
+ * end
+ *
+ */

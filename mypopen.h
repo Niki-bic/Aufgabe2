@@ -1,3 +1,23 @@
+/**
+ * @file mypopen.h
+ * BES - header file for the mypopen.c function
+ * Projekt 2
+ *
+ * Gruppe 13
+ *
+ * @author Patrik Binder         <ic19b030@technikum-wien.at>
+ * @author Stefan Pittner        <ic19b003@technikum-wien.at>
+ * @author Nikolaus Ferchenbauer <ic19b013@technikum-wien.at>
+ * @date 2020/05/4
+ *
+ * @version 1.x
+ *
+ */
+
+/**
+ * -------------------------------------------------------------- includes --
+ */
+
 #ifndef MYPOPEN_H
 #define MYPOPEN_H
 
@@ -9,6 +29,9 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+/**
+ * ------------------------------------------------------------- functions --
+ */
 
 FILE *mypopen(const char *const command, const char *const type);
 int mypclose(FILE *stream);
@@ -18,3 +41,6 @@ void reset(void);
 
 
 #endif
+/**
+ * end
+ */
