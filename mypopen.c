@@ -31,6 +31,13 @@ static FILE *g_stream = NULL;
  * ------------------------------------------------------------- functions --
  */
 
+/**
+ * \brief reset - function to reset globals
+ * @details this function resets the global variables
+ * in case the fuction gets called more often
+ *
+ * \return no return value
+*/
 
 void reset(void) {
 	g_childpid = -1;
