@@ -5,9 +5,9 @@
  *
  * Gruppe 13
  *
- * @author Patrik Binder         <ic19b030@technikum-wien.at>
- * @author Stefan Pittner        <ic19b003@technikum-wien.at>
- * @author Nikolaus Ferchenbauer <ic19b013@technikum-wien.at>
+ * @author Binder Patrik         <ic19b030@technikum-wien.at>
+ * @author Ferchenbauer Nikolaus <ic19b013@technikum-wien.at>
+ * @author Pittner Stefan        <ic19b003@technikum-wien.at>
  * @date 2020/05/4
  *
  * @version 1.x
@@ -31,11 +31,13 @@ static FILE *g_stream = NULL;
  * ------------------------------------------------------------- functions --
  */
 
+
 void reset(void) {
 	g_childpid = -1;
 	g_stream = NULL;
 } 
 // end reset
+
 
 /**
  * \brief mypopen - a simple implementation of the popen function to fork a process
@@ -90,8 +92,9 @@ FILE *mypopen(const char *const command, const char *const type) {
 } 
 // end mypopen
 
+
 /**
- * \brief child_process - function called insinde the child process for redirection
+ * \brief child_process - function called inside the child process for redirection
  * @details this function calls the system function dup2 to redirect either stdout 
  * or stdin from the child process to the used end, either to the read or write end 
  * of the pipe, then the execl systemcall opens the bash shell with the -c 
@@ -103,6 +106,7 @@ FILE *mypopen(const char *const command, const char *const type) {
  *
  * \return no return value
 */
+
 
 void child_process(int *fd, const char *const type, const char *const command) {
 	// command-Eingabe wird in pipe geschrieben
@@ -143,6 +147,7 @@ void child_process(int *fd, const char *const type, const char *const command) {
 } 
 // end child_process
 
+
 /**
  * \brief parent_process - function called inside the parent process to 
  * convert the file descriptor
@@ -180,10 +185,11 @@ void parent_process(int *fd, const char *const type) {
 } 
 // end parent_process
 
+
 /**
  * \brief mypclose - function waiting for the child process to terminate
  * @details this function waits for the process called by mypopen to terminate,
- * it returns the exit status created by waitpid and closes the passed file stream
+ * it returns the exit status of the child-process and closes the passed file stream
  * if it is equal to the associated one from mypopen
  *
  * \param *stream - filepointer handed over by the caller
@@ -234,6 +240,7 @@ int mypclose(FILE *stream) {
 	}
 } 
 // end mypclose
+
 
 /**
  * =================================================================== eof ==

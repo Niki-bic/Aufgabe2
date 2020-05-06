@@ -1,4 +1,3 @@
-#
 # @file Makefile
 # BES mypopen
 # Projekt 2
@@ -12,15 +11,16 @@
 #
 # @version 1.7.0
 #
-# ------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------
 
 # ------------------------------------------------------------- variables --
 # tools and options:
 
-CC     = gcc
-CFLAGS = -Wall -g -c
+CC     =  gcc
+CFLAGS = -Wall -Werror -Wextra -Wstrict-prototypes -Wformat=2 -pedantic \
+         -fno-common -ftrapv -O3 -g -c -std=gnu11 
 TFLAGS = -lpopentest -ldl
-RM     = rm -f
+RM     =  rm -f
 
 # filenames:
 
@@ -35,13 +35,16 @@ DFILE  = Doxyfile
 # --------------------------------------------------------------- targets --
 # .PHONY
 
-.PHONY: all clean distclean cleanall
+.PHONY: all clean doc distclean cleanall
 
 all: $(EXEC)
 
 
 clean:
 	$(RM) $(EXEC) $(OBJ)
+
+doc:
+	$(DOXY) $(DFILE)
 
 distclean:
 	$(RM) -r $(DOC)
@@ -56,8 +59,7 @@ $(EXEC): $(OBJ)
 
 $(OBJ): $(SRC) $(HEADER)
 	$(CC) $(CFLAGS) $<
-	$(DOXY) $(DFILE)
 
-# ------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------
 
 

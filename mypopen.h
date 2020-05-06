@@ -5,9 +5,9 @@
  *
  * Gruppe 13
  *
- * @author Patrik Binder         <ic19b030@technikum-wien.at>
- * @author Stefan Pittner        <ic19b003@technikum-wien.at>
- * @author Nikolaus Ferchenbauer <ic19b013@technikum-wien.at>
+ * @author Binder Patrik         <ic19b030@technikum-wien.at>
+ * @author Pittner Stefan        <ic19b003@technikum-wien.at>
+ * @author Ferchenbauer Nikolaus <ic19b013@technikum-wien.at>
  * @date 2020/05/4
  *
  * @version 1.x
@@ -30,7 +30,7 @@
 #include <unistd.h>
 
 /**
- * ------------------------------------------------------------- functions --
+ * -------------------------------------------------------------- functions --
  */
 
 FILE *mypopen(const char *const command, const char *const type);
@@ -41,6 +41,7 @@ void reset(void);
 
 
 #endif
+
 /**
  * end
  */
